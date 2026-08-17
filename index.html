@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Novel Studio — Author Workspace</title>
+<style>
+:root{
+  --bg:#0b0b12;--panel:#12121b;--panel2:#171725;--line:#29293a;
+  --text:#f5f3fb;--muted:#a7a3b8;--accent:#a78bfa;--accent2:#7c3aed;
+  --good:#4ade80;--warn:#fbbf24;--danger:#fb7185;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:radial-gradient(circle at 12% 0%,#21183a 0,#0b0b12 40%);color:var(--text);
+font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}
+.sidebar{border-right:1px solid var(--line);background:rgba(12,12,20,.88);backdrop-filter:blur(16px);padding:22px;position:sticky;top:0;height:100vh}
+.brand{font-weight:900;letter-spacing:.16em;font-size:12px;text-transform:uppercase;color:var(--accent)}
+.brand-name{font-size:22px;font-weight:900;margin-top:8px}
+.nav{margin-top:28px;display:grid;gap:8px}
+.nav button{border:1px solid transparent;background:transparent;color:var(--muted);text-align:left;padding:12px;border-radius:11px}
+.nav button.active,.nav button:hover{background:var(--panel2);border-color:var(--line);color:var(--text)}
+.nav small{display:block;font-size:10px;opacity:.8;margin-top:2px}
+.profile{position:absolute;left:22px;right:22px;bottom:22px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+.profile .name{font-weight:800;font-size:13px}.profile .role{font-size:11px;color:var(--muted);margin-top:3px}
+
+.main{padding:28px 34px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px}
+.kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}
+h1{font-size:31px;line-height:1.1;margin:8px 0}
+.subtitle{font-size:13px;color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:var(--panel);color:var(--text);border:1px solid var(--line);padding:10px 13px;border-radius:10px}
+.btn.primary{background:linear-gradient(135deg,var(--accent2),#8b5cf6);border-color:transparent}
+.btn:hover{transform:translateY(-1px)}
+
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.card{background:rgba(18,18,27,.88);border:1px solid var(--line);border-radius:15px;padding:16px}
+.label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800}
+.value{font-size:26px;font-weight:900;margin-top:5px}
+.subvalue{font-size:11px;color:var(--muted);margin-top:3px}
+
+.view{display:none}
+.view.active{display:block}
+
+.search-row{display:flex;gap:10px;margin-bottom:14px}
+.search{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--text);padding:11px 12px;border-radius:10px;outline:none}
+.search:focus{border-color:var(--accent)}
+
+.library{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.novel-card{background:linear-gradient(145deg,#151521,#11111a);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.cover{height:180px;background:linear-gradient(135deg,#261b44,#0d0d15);display:flex;align-items:flex-end;padding:16px;position:relative}
+.cover .badge{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.12);padding:5px 8px;border-radius:999px;font-size:10px}
+.cover .cover-title{font-size:18px;font-weight:900;line-height:1.12;max-width:88%}
+.card-body{padding:14px}
+.card-title{font-weight:850;font-size:16px;line-height:1.25}
+.card-desc{font-size:12px;line-height:1.55;color:var(--muted);margin:7px 0 12px}
+.tags span{display:inline-block;border:1px solid #342d47;background:#1c1828;color:#d7c9ff;border-radius:999px;padding:5px 7px;font-size:10px;margin:0 5px 5px 0}
+.progress{height:7px;background:#242436;border-radius:99px;overflow:hidden;margin-top:8px}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));width:0}
+.meta-row{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:8px}
+.card-actions{display:flex;gap:7px;margin-top:12px}
+.card-actions .btn{flex:1}
+
+.workspace{display:grid;grid-template-columns:1fr 300px;gap:18px}
+.panel{background:rgba(18,18,27,.9);border:1px solid var(--line);border-radius:16px;padding:18px}
+.panel h3{margin:0 0 12px;font-size:15px}
+.chapter-list{display:grid;gap:8px}
+.chapter{display:grid;grid-template-columns:55px 1fr auto;align-items:center;gap:10px;padding:10px 11px;background:#101018;border:1px solid var(--line);border-radius:10px}
+.chapter .num{font-size:11px;color:var(--accent);font-weight:850}
+.chapter .title{font-size:13px;font-weight:750}
+.chapter .status{font-size:10px;color:var(--good)}
+.chapter .open{font-size:11px;color:var(--text);border:0;background:transparent}
+
+.reader{max-width:820px;margin:auto}
+.reader h2{font-family:Georgia,serif;font-size:32px;line-height:1.2;margin:5px 0 10px}
+.reader .reader-meta{font-size:12px;color:var(--muted);padding-bottom:16px;border-bottom:1px solid var(--line)}
+.reader-content{font-family:Georgia,serif;font-size:19px;line-height:1.92;color:#eeeaf5;margin-top:26px}
+.reader-content p{margin:0 0 1.1em}
+.cliff{border-left:3px solid var(--accent);background:rgba(167,139,250,.08);padding:15px 17px;border-radius:0 10px 10px 0}
+.reader-nav{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:18px;margin-top:28px}
+
+.back{margin-bottom:16px}
+
+.empty{padding:40px 20px;text-align:center;border:1px dashed var(--line);border-radius:14px;color:var(--muted)}
+.note{font-size:12px;line-height:1.7;color:var(--muted)}
+.quick{display:grid;gap:9px}
+.quick .item{background:#101018;border:1px solid var(--line);padding:11px;border-radius:10px;font-size:12px}
+
+.toast{position:fixed;right:24px;bottom:24px;background:#171725;border:1px solid var(--line);padding:12px 14px;border-radius:10px;opacity:0;transition:.2s}
+.toast.show{opacity:1}
+
+@media(max-width:1100px){
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .library{grid-template-columns:repeat(2,1fr)}
+  .workspace{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .app{display:block}.sidebar{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}
+  .profile{position:static;margin-top:20px}.nav{grid-template-columns:repeat(2,1fr)}
+  .main{padding:20px 14px}.top{flex-direction:column}
+  .cards{grid-template-columns:1fr 1fr}.library{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">Author Workspace</div>
+    <div class="brand-name">Novel Studio</div>
+    <div class="nav">
+      <button class="active" data-view="dashboard">Dashboard<small>Ringkasan proyek</small></button>
+      <button data-view="library">Library<small>Semua novel</small></button>
+      <button data-view="writing">Writing Room<small>Novel aktif</small></button>
+      <button data-view="reader">Reader<small>Baca bab</small></button>
+    </div>
+    <div class="profile"><div class="name">Author / Publisher</div><div class="role">GoodNovel • KBM • Original Works</div></div>
+  </aside>
+
+  <main class="main">
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="view active">
+      <div class="top">
+        <div><div class="kicker">Novel Studio</div><h1>Semua cerita dalam satu tempat.</h1><div class="subtitle">Pusat untuk produksi, membaca, dan memantau semua novel.</div></div>
+        <div class="actions"><button class="btn primary" onclick="openView('library')">Buka Library</button><button class="btn" onclick="openView('writing')">Writing Room</button></div>
+      </div>
+      <div class="cards">
+        <div class="card"><div class="label">Total novel</div><div class="value" id="totalNovels">1</div><div class="subvalue">Katalog aktif</div></div>
+        <div class="card"><div class="label">Bab tersedia</div><div class="value" id="totalChapters">10</div><div class="subvalue">Semua proyek</div></div>
+        <div class="card"><div class="label">Sedang ditulis</div><div class="value">1</div><div class="subvalue">Novel #001</div></div>
+        <div class="card"><div class="label">Target katalog</div><div class="value">5</div><div class="subvalue">Novel jangka awal</div></div>
+      </div>
+
+      <div class="workspace">
+        <div class="panel">
+          <h3>Novel aktif</h3>
+          <div class="novel-card" style="border-radius:13px">
+            <div class="cover"><span class="badge">NOVEL #001 • WRITING</span><div class="cover-title">Setelah Diceraikan, Aku Menjadi Pewaris yang Mereka Takuti</div></div>
+            <div class="card-body">
+              <div class="card-title">Romance • CEO • Revenge • Mystery</div>
+              <div class="card-desc">Alena diceraikan Rafael setelah tiga tahun pernikahan. Setelah kembali sebagai pewaris Wiratama, ia mulai membongkar rahasia kematian ayahnya.</div>
+              <div class="meta-row"><span>10 / 150 bab</span><span>6.7%</span></div>
+              <div class="progress"><span style="width:6.67%"></span></div>
+              <div class="card-actions"><button class="btn primary" onclick="openNovel(1)">Buka novel</button><button class="btn" onclick="openView('reader');loadChapter(1)">Baca</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Next production</h3>
+          <div class="quick">
+            <div class="item">01 · Lanjutkan Bab 6–10</div>
+            <div class="item">02 · Kumpulkan stok minimal 15 bab</div>
+            <div class="item">03 · Finalisasi sinopsis & cover</div>
+            <div class="item">04 · Siapkan publishing tracker</div>
+          </div>
+          <div class="section-title" style="margin-top:18px;font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase">Arsip ide</div>
+          <div class="note">Novel #002 dan seterusnya akan masuk ke Library tanpa mengganggu novel aktif.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section id="library" class="view">
+      <div class="top">
+        <div><div class="kicker">Library</div><h1>Katalog Novel</h1><div class="subtitle">Semua novel yang sudah dibuat atau sedang dikembangkan.</div></div>
+        <div class="actions"><button class="btn primary" onclick="showToast('Novel baru disiapkan di katalog.')">+ Novel Baru</button></div>
+      </div>
+      <div class="search-row"><input class="search" id="librarySearch" placeholder="Cari judul atau genre..."></div>
+      <div class="library" id="libraryGrid"></div>
+    </section>
+
+    <!-- WRITING -->
+    <section id="writing" class="view">
+      <div class="top">
+        <div><div class="kicker">Writing Room</div><h1 id="workTitle">Novel #001 — Alena</h1><div class="subtitle">Ruang kerja produksi naskah.</div></div>
+        <div class="actions"><button class="btn" onclick="openView('library')">← Library</button><button class="btn primary" onclick="openView('reader');loadChapter(1)">Baca</button></div>
+      </div>
+      <div class="workspace">
+        <div class="panel">
+          <h3>Bab yang tersedia</h3>
+          <div class="chapter-list" id="workChapters"></div>
+        </div>
+        <div class="panel">
+          <h3>Kontrol produksi</h3>
+          <div class="quick">
+            <div class="item"><strong>Status:</strong> Draft aktif</div>
+            <div class="item"><strong>Stok:</strong> 10 bab</div>
+            <div class="item"><strong>Target stok:</strong> 15 bab</div>
+            <div class="item"><strong>Target akhir:</strong> 150 bab</div>
+          </div>
+          <div class="section-title" style="margin-top:18px;font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase">Publishing</div>
+          <div class="note">GoodNovel: belum upload<br>KBM: belum upload</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- READER -->
+    <section id="reader" class="view">
+      <div class="back"><button class="btn" onclick="openView('library')">← Kembali ke Library</button></div>
+      <div class="reader">
+        <div class="kicker" id="readerBookNo">NOVEL #001</div>
+        <h2 id="readerTitle">SURAT PERCERAIAN</h2>
+        <div class="reader-meta" id="readerMeta">Bab 1 • Romance • CEO • Revenge • Mystery</div>
+        <article class="reader-content" id="readerContent"></article>
+        <div class="reader-nav"><button class="btn" id="prevChapter">← Sebelumnya</button><button class="btn primary" id="nextChapter">Berikutnya →</button></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const novel1 = {
+ id:1, no:"#001", status:"WRITING",
+ title:"Setelah Diceraikan, Aku Menjadi Pewaris yang Mereka Takuti",
+ genres:["Romance","CEO","Revenge","Mystery"], chapters:10,target:150,
+ desc:"Alena diceraikan Rafael setelah tiga tahun pernikahan. Setelah kembali sebagai pewaris Wiratama, ia mulai membongkar rahasia kematian ayahnya.",
+ chapterData:[
+  {n:1,t:"SURAT PERCERAIAN",m:"Hook • Perceraian • Awal misteri",c:`<p>Hujan turun sejak sore.</p><p>Dari balik jendela ruang makan, Alena Wiratama memandangi halaman rumah yang perlahan tertutup kabut. Tiga tahun lalu, ia membayangkan malam ulang tahun pernikahannya akan terlihat berbeda.</p><p>Mungkin ada makan malam sederhana. Mungkin sebotol anggur. Mungkin Rafael akan pulang lebih awal untuk pertama kalinya.</p><p>Tetapi sampai pukul sebelas malam, kursi di hadapannya tetap kosong.</p><p>Hanya sebuah notifikasi berita bisnis yang muncul di layar ponselnya.</p><div class="cliff"><strong>Rafael Aditya menghadiri gala dinner bersama Valerie Aurelia.</strong></div><p>Pintu depan terbuka. Rafael akhirnya pulang.</p><p>“Ini ulang tahun pernikahan kita,” kata Alena.</p><p>Rafael meletakkan sebuah map putih di atas meja.</p><p>“Ada yang perlu kau tanda tangani.”</p><p>Alena menatap map tersebut.</p><p>“Apa itu?”</p><p>“Surat perceraian.”</p><p>Ia membaca semuanya. Tidak memohon. Tidak menangis.</p><p>Alena mengambil pena dan membubuhkan tanda tangannya.</p><p>“Kau tidak mau membicarakannya?” tanya Rafael.</p><p>“Untuk apa? Kau sudah membuat keputusan.”</p><p>Ia mendorong dokumen itu kembali.</p><p>“Selamat malam.”</p><p>Alena pergi.</p><p>Tak lama setelah meninggalkan rumah keluarga Aditya, teleponnya berdering.</p><p>“Nona Alena.”</p><p>“Siapa?”</p><div class="cliff"><strong>“Sudah waktunya Anda pulang. Keluarga Wiratama menunggu Anda.”</strong></div>`},
+  {n:2,t:"ISTRI YANG TIDAK PERNAH DIANGGAP",m:"Keluarga Aditya • Alena pulang",c:`<p>Pagi berikutnya, rumah keluarga Aditya dipenuhi suara.</p><p>Martha Aditya tampak puas karena Alena sudah pergi.</p><p>Namun Rafael justru terus teringat satu hal: Alena terlalu tenang saat menandatangani perceraian.</p><p>Di tempat lain, Alena duduk di dalam mobil hitam bersama Gavin.</p><p>“Apa mereka tahu aku sudah bercerai?” tanyanya.</p><p>“Semua orang di keluarga Wiratama tahu, Nona.”</p><p>Mobil memasuki kawasan gedung kaca raksasa.</p><div class="cliff"><strong>WIRATAMA GROUP</strong></div><p>Beberapa eksekutif telah menunggunya.</p><p>“Selamat datang kembali, Nona.”</p><p>Alena menarik napas.</p><p>“Aku sudah terlambat tiga tahun.”</p><p>Hari itu, Alena Wiratama kembali ke tempat yang sejak awal menjadi miliknya.</p>`},
+  {n:3,t:"PERGI TANPA MEMBAWA APA PUN",m:"Rafael • Rumah kosong • Keluarga Wiratama",c:`<p>Rafael datang ke kamar Alena.</p><p>Kosong.</p><p>Tidak ada pakaian. Tidak ada koper. Tidak ada foto pernikahan.</p><p>Di atas meja hanya ada sebuah kotak berisi cincin pernikahan.</p><div class="cliff"><strong>“Aku tidak membutuhkan apa pun dari rumah ini.”</strong></div><p>Sementara itu, Alena duduk di ruang rapat Wiratama Group.</p><p>Adrian menyambutnya dengan senyum.</p><p>“Selamat datang kembali, Alena.”</p><p>Alena membuka berkas.</p><p>“Aku ingin melihat laporan perusahaan.”</p><p>Adrian mencoba menahannya.</p><p>“Aku sudah terlambat tiga tahun,” jawab Alena.</p><div class="cliff"><strong>“Aku ingin mengambil kembali milik keluargaku.”</strong></div>`},
+  {n:4,t:"NAMA YANG SELAMA INI DISEMBUNYIKAN",m:"Identitas Alena • Dokumen lama",c:`<p>Rafael membaca berita bisnis pagi itu dan tidak percaya.</p><p>Nama Alena Wiratama terpampang jelas.</p><p>Ia menyadari bahwa selama tiga tahun, ia hampir tidak mengenal perempuan yang dinikahinya.</p><p>Di kantor Wiratama, Gavin menyerahkan dokumen transaksi lama.</p><p>Alena menemukan nama perusahaan:</p><div class="cliff"><strong>Aditya Holdings.</strong></div><p>Tanggalnya berada dua minggu sebelum ayahnya meninggal.</p><p>Ia menelusuri sampai bagian tanda tangan.</p><div class="cliff"><strong>Rafael Aditya.</strong></div><p>Alena menutup berkas.</p><p>“Belum cukup,” katanya.</p>`},
+  {n:5,t:"SUDAH WAKTUNYA KAMU PULANG",m:"Surat ayah • Ancaman • Mystery utama",c:`<p>Pukul sebelas malam. Alena masih berada di ruang kerjanya ketika Gavin membawa sebuah amplop tua.</p><p>Di dalamnya terdapat tulisan tangan ayahnya.</p><div class="cliff"><strong>“Jangan percaya siapa pun yang mengatakan kematianku adalah kecelakaan.”</strong></div><p>Baris berikutnya membuat tangan Alena bergetar.</p><p>“Ada seseorang dari keluarga kita yang telah mengkhianatiku.”</p><p>Ponselnya berdering.</p><p>Suara yang sama dari malam perceraian terdengar di ujung telepon.</p><p>“Anda sudah menemukan suratnya.”</p><p>Alena bertanya siapa dia.</p><div class="cliff"><strong>“Jangan datang ke rumah keluarga Wiratama besok. Orang yang membunuh ayah Anda mungkin masih tinggal di sana.”</strong></div>`},
+  {n:6,t:"BERITA YANG MENGGEMPARKAN",m:"Media • Identitas pewaris • Rafael terkejut",c:`<p>Pagi itu, nama Alena Wiratama muncul di hampir seluruh portal bisnis besar.</p>
+<p>Selama bertahun-tahun, publik hanya mengenal keluarga Wiratama sebagai keluarga yang memilih bergerak di belakang layar. Tidak ada satu pun pewaris perempuan yang pernah muncul secara resmi.</p>
+<p>Sekarang semuanya berubah.</p>
+<div class="cliff"><strong>“ALENA WIRATAMA RESMI MUNCUL SEBAGAI PEWARIS UTAMA WIRATAMA GROUP.”</strong></div>
+<p>Rafael membaca judul itu dalam diam.</p>
+<p>Ia membaca artikel sampai akhir. Di sana tertulis bahwa Alena merupakan putri tunggal mendiang Richard Wiratama.</p>
+<p>Pria yang selama ini ia anggap sebagai orang biasa ternyata adalah pewaris salah satu keluarga bisnis terbesar di kota.</p>
+<p>Rafael meletakkan ponsel.</p>
+<p>“Kenapa kau tidak pernah memberitahuku?” gumamnya.</p>
+<p>Nathan yang berada di sofa seberang menatapnya.</p>
+<p>“Karena mungkin dia tahu kau tidak akan percaya.”</p>
+<p>Rafael menatap adiknya tajam.</p>
+<p>“Kau membelanya?”</p>
+<p>Nathan menggeleng.</p>
+<p>“Aku hanya mengatakan fakta.”</p>
+<p>Sementara itu, di ruang konferensi Wiratama Group, Alena berdiri di depan jajaran direksi.</p>
+<p>“Saya tidak kembali untuk mengambil jabatan seseorang,” katanya tenang.</p>
+<p>“Saya kembali karena ada urusan keluarga yang belum selesai.”</p>
+<p>Adrian tersenyum tipis.</p>
+<p>“Urusan keluarga?”</p>
+<p>“Kematian Ayah.”</p>
+<p>Ruangan langsung senyap.</p>
+<div class="cliff"><strong>Untuk pertama kalinya, Adrian kehilangan kendali atas ekspresinya.</strong></div>`},
+  {n:7,t:"MANTAN ISTRI SANG CEO",m:"Pertemuan Alena–Rafael • Tarik-ulur",c:`<p>Rafael datang ke Wiratama Group tanpa pemberitahuan.</p>
+<p>Ketika pintu ruang kerja Alena terbuka, perempuan itu bahkan tidak mengangkat kepala.</p>
+<p>“Kau datang untuk apa?”</p>
+<p>Rafael menutup pintu.</p>
+<p>“Kita perlu bicara.”</p>
+<p>Alena akhirnya menatapnya.</p>
+<p>“Kita sudah bicara. Tiga tahun.”</p>
+<p>Rafael terdiam.</p>
+<p>“Tentang perceraian?” lanjut Alena.</p>
+<p>“Bukan.”</p>
+<p>Rafael maju beberapa langkah.</p>
+<p>“Tentang siapa dirimu sebenarnya.”</p>
+<p>Alena tersenyum tipis.</p>
+<p>“Bukankah itu sudah jelas?”</p>
+<p>“Tidak bagiku.”</p>
+<p>“Itu masalahmu, Rafael.”</p>
+<p>Rafael menahan emosinya.</p>
+<p>“Kenapa kau menyembunyikan semuanya dariku?”</p>
+<p>Alena berdiri.</p>
+<p>“Karena selama tiga tahun kau tidak pernah benar-benar mengenalku.”</p>
+<p>Kalimat itu membuat Rafael terdiam.</p>
+<p>Untuk pertama kalinya ia tidak mempunyai jawaban.</p>
+<p>Ia hanya menatap perempuan di hadapannya.</p>
+<p>Perempuan yang kemarin masih menjadi istrinya.</p>
+<p>Sekarang berdiri di depannya sebagai orang asing.</p>
+<div class="cliff"><strong>“Kalau aku tidak pernah mengenalmu,” kata Rafael pelan, “kenapa kau memilih menikah denganku?”</strong></div>`},
+  {n:8,t:"PERNIKAHAN YANG TIDAK PERNAH RAFAEL KETAHUI",m:"Masa lalu • Alasan Alena menikah",c:`<p>Alena tidak langsung menjawab.</p>
+<p>Ia kembali duduk dan membuka sebuah laci.</p>
+<p>Dari dalamnya ia mengambil sebuah foto lama.</p>
+<p>Foto ayahnya.</p>
+<p>“Tiga tahun lalu, aku menemukan sesuatu tentang kematian Ayah.”</p>
+<p>Rafael menatap foto itu.</p>
+<p>“Apa hubungannya denganku?”</p>
+<p>“Perusahaanmu.”</p>
+<p>Alena meletakkan sebuah salinan dokumen di atas meja.</p>
+<p>“Ada transaksi antara perusahaan Ayah dan Aditya Holdings sebelum kecelakaan itu.”</p>
+<p>Rafael mengerutkan kening.</p>
+<p>“Aku tidak tahu.”</p>
+<p>“Aku juga tidak tahu siapa yang terlibat.”</p>
+<p>Alena menarik napas.</p>
+<p>“Itulah alasan aku menikah denganmu.”</p>
+<p>Rafael membeku.</p>
+<p>“Jadi... selama ini pernikahan kita hanya penyelidikan?”</p>
+<p>Alena tidak menjawab.</p>
+<p>Jawaban itu sudah cukup.</p>
+<p>Rafael tertawa pendek, tetapi tanpa humor.</p>
+<p>“Dan aku mengira hanya aku yang punya rahasia.”</p>
+<p>Alena menatapnya.</p>
+<p>“Aku memang punya alasan untuk berbohong.”</p>
+<p>“Dan aku?”</p>
+<p>“Kau punya pilihan untuk mengenalku.”</p>
+<div class="cliff"><strong>Rafael menatap dokumen di atas meja dan tiba-tiba menyadari satu hal: tanda tangannya sendiri mungkin terkait dengan kematian seorang pria.</strong></div>`},
+  {n:9,t:"RAFAEL MULAI MENYELIDIKI ISTRINYA SENDIRI",m:"Investigasi Rafael • Rahasia keluarga",c:`<p>Malam itu Rafael tidak pulang.</p>
+<p>Ia justru kembali ke kantor dan meminta kepala legal membawa seluruh arsip lama Aditya Holdings.</p>
+<p>“Aku mau semua transaksi tiga tahun lalu.”</p>
+<p>“Tuan, sebagian arsip sudah dipindahkan.”</p>
+<p>“Cari.”</p>
+<p>Rafael membuka dokumen satu per satu.</p>
+<p>Beberapa transaksi terasa familiar.</p>
+<p>Lalu ia menemukan sebuah nama.</p>
+<p><strong>Richard Wiratama.</strong></p>
+<p>Di bawahnya terdapat tanda tangan yang berbeda dari salinan dokumen milik Alena.</p>
+<p>Rafael membandingkannya.</p>
+<p>Ada yang tidak cocok.</p>
+<p>“Ini bukan tanda tangan asli.”</p>
+<p>Kepala legal tampak bingung.</p>
+<p>“Maksud Anda?”</p>
+<p>“Dokumen ini sudah diubah.”</p>
+<p>Rafael terus membaca.</p>
+<p>Di halaman terakhir terdapat sebuah catatan internal yang tidak pernah masuk laporan resmi.</p>
+<p>Hanya satu kalimat:</p>
+<div class="cliff"><strong>“Instruksi datang dari pihak internal.”</strong></div>
+<p>Rafael menyandarkan tubuh ke kursinya.</p>
+<p>Pihak internal.</p>
+<p>Artinya seseorang dari dalam perusahaan keluarganya sendiri terlibat.</p>
+<p>Dan orang itu mungkin masih bekerja di sana.</p>
+<p>Rafael mengambil ponsel.</p>
+<p>Ia hampir menelepon Alena.</p>
+<p>Namun tangannya berhenti.</p>
+<p>Untuk pertama kalinya, ia bertanya-tanya apakah Alena akan mempercayainya.</p>`},
+  {n:10,t:"NAMA DI BALIK KEMATIAN",m:"Bukti pertama • Ancaman baru • Cliffhanger",c:`<p>Alena tiba di ruang arsip lama Wiratama sebelum matahari terbit.</p>
+<p>Gavin sudah menunggunya.</p>
+<p>“Ada sesuatu yang ditemukan,” katanya.</p>
+<p>Ia menyerahkan sebuah folder tipis.</p>
+<p>Alena membukanya.</p>
+<p>Di dalamnya terdapat salinan laporan kecelakaan ayahnya.</p>
+<p>Namun ada satu halaman yang sebelumnya tidak pernah ia lihat.</p>
+<p>Bagian bawah laporan mencantumkan nama perusahaan yang membayar perbaikan kendaraan beberapa hari sebelum kecelakaan.</p>
+<p><strong>Aditya Holdings.</strong></p>
+<p>Alena menahan napas.</p>
+<p>Gavin menunjuk catatan kecil di bagian belakang.</p>
+<p>“Perhatikan inisial ini.”</p>
+<p>Alena membaca:</p>
+<p><strong>A.W.</strong></p>
+<p>“Adrian Wiratama?”</p>
+<p>Gavin tidak menjawab.</p>
+<p>“Kita belum bisa menyimpulkan.”</p>
+<p>Alena menutup folder.</p>
+<p>“Tapi dia orang pertama yang harus kita periksa.”</p>
+<p>Di luar ruangan, langkah kaki terdengar.</p>
+<p>Seseorang berhenti tepat di depan pintu.</p>
+<p>Alena dan Gavin saling menatap.</p>
+<p>Pintu perlahan terbuka.</p>
+<p>Adrian berdiri di sana.</p>
+<p>Senyumnya tenang.</p>
+<p>“Kalian sedang mencari sesuatu?”</p>
+<div class="cliff"><strong>Alena menatap pamannya dan untuk pertama kalinya bertanya dalam hati: apakah lelaki yang berdiri di depannya adalah orang yang mengkhianati ayahnya?</strong></div>`
+ ]
+};
+
+const novels=[novel1];
+let currentChapter=Number(localStorage.getItem("novel_studio_current")||1);
+
+function openView(id){
+ document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
+ if(id==="library")renderLibrary();
+ if(id==="writing")renderWriting();
+ if(id==="reader")loadChapter(currentChapter);
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>openView(b.dataset.view));
+
+function openNovel(id){
+ if(id===1){document.getElementById("workTitle").textContent="Novel #001 — Alena";openView("writing");}
+}
+
+function renderLibrary(filter=""){
+ const grid=document.getElementById("libraryGrid");grid.innerHTML="";
+ const q=filter.toLowerCase();
+ const list=novels.filter(n=>(n.title+" "+n.genres.join(" ")).toLowerCase().includes(q));
+ if(!list.length){grid.innerHTML='<div class="empty">Belum ada novel yang cocok.</div>';return;}
+ list.forEach(n=>{
+   const pct=(n.chapters/n.target*100).toFixed(1);
+   const card=document.createElement("article");card.className="novel-card";
+   card.innerHTML=`<div class="cover"><span class="badge">NOVEL ${n.no} • ${n.status}</span><div class="cover-title">${n.title}</div></div>
+   <div class="card-body"><div class="card-title">${n.title}</div>
+   <div class="card-desc">${n.desc}</div>
+   <div class="tags">${n.genres.map(g=>`<span>${g}</span>`).join("")}</div>
+   <div class="meta-row"><span>${n.chapters} / ${n.target} bab</span><span>${pct}%</span></div>
+   <div class="progress"><span style="width:${Math.min(100,pct)}%"></span></div>
+   <div class="card-actions"><button class="btn primary" onclick="openNovel(${n.id})">Workspace</button><button class="btn" onclick="openView('reader');loadChapter(1)">Baca</button></div></div>`;
+   grid.appendChild(card);
+ });
+}
+document.getElementById("librarySearch").oninput=e=>renderLibrary(e.target.value);
+
+function renderWriting(){
+ const list=document.getElementById("workChapters");list.innerHTML="";
+ novel1.chapterData.forEach(c=>{
+  const row=document.createElement("div");row.className="chapter";
+  row.innerHTML=`<div class="num">BAB ${c.n}</div><div class="title">${c.t}</div><div><span class="status">SELESAI</span> <button class="open" onclick="openView('reader');loadChapter(${c.n})">Baca →</button></div>`;
+  list.appendChild(row);
+ });
+}
+
+function loadChapter(n){
+ const c=novel1.chapterData.find(x=>x.n===n)||novel1.chapterData[0];
+ currentChapter=c.n;localStorage.setItem("novel_studio_current",String(currentChapter));
+ document.getElementById("readerBookNo").textContent="NOVEL #001 • SETELAH DICERAIKAN...";
+ document.getElementById("readerTitle").textContent=c.t;
+ document.getElementById("readerMeta").textContent=`Bab ${c.n} • ${c.m}`;
+ document.getElementById("readerContent").innerHTML=c.c;
+ document.getElementById("prevChapter").disabled=c.n===1;
+ document.getElementById("nextChapter").textContent=c.n===novel1.chapterData.length?"Bab berikutnya →":"Bab berikutnya →";
+ document.getElementById("prevChapter").onclick=()=>{if(currentChapter>1)loadChapter(currentChapter-1)};
+ document.getElementById("nextChapter").onclick=()=>{if(currentChapter<novel1.chapterData.length)loadChapter(currentChapter+1);else showToast("Bab berikutnya belum ditulis.");};
+}
+
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.__t);window.__t=setTimeout(()=>t.classList.remove("show"),1600)}
+
+function refreshStats(){
+ document.getElementById("totalNovels").textContent=novels.length;
+ document.getElementById("totalChapters").textContent=novels.reduce((a,n)=>a+n.chapters,0);
+}
+refreshStats();renderLibrary();renderWriting();loadChapter(currentChapter);
+</script>
+</body>
+</html>
